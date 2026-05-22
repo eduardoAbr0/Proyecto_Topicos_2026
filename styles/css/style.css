@@ -1,0 +1,72 @@
+body {
+  font-family: 'Outfit', sans-serif;
+}
+
+#header{
+    background-color: #A8BBA3 !important;
+}
+
+#footer{
+    background-color: #B87C4C;
+}
+
+.hover-underline-animation {
+  display: inline-block;
+  position: relative;
+}
+
+.hover-underline-animation::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #EBD9D1;
+  transition: transform 0.25s ease-out;
+}
+
+.hover-underline-animation:hover::after {
+  transform: scaleX(1);
+}
+
+.hover-underline-animation.left::after {
+  transform-origin: bottom right;
+}
+
+.hover-underline-animation.left:hover::after {
+  transform-origin: bottom left;
+}
+
+.hover-underline-animation.center::after {
+  transform-origin: bottom center;
+}
+
+.hover-underline-animation.center:hover::after {
+  transform-origin: bottom center;
+}
+
+.hover-underline-animation.right::after {
+  transform-origin: bottom left;
+}
+
+.hover-underline-animation.right:hover::after {
+  transform-origin: bottom right;
+}
+
+/* Estilo para mensajes de Libreria Validation */
+/*Mensaje fallo*/
+.LV_validation_message.LV_invalid {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+    font-weight: bold;
+}
+
+/* Mensaje exito*/
+.LV_validation_message.LV_valid {
+    color: #198754; 
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
