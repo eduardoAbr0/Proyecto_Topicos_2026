@@ -168,6 +168,19 @@ export default function MiembrosPage() {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/api/auth/logout', { method: 'POST' });
+            const data = await response.json();
+
+            if (data.status === "exito") {
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+        }
+    };
+
     const miembrosFiltrados = miembros.filter((m: any) =>
         m.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
         m.primer_apellido.toLowerCase().includes(busqueda.toLowerCase())
@@ -211,9 +224,15 @@ export default function MiembrosPage() {
 
             <section className="content-header">
                 <div className="container-fluid">
-                    <div className="row mb-2">
+                    <div className="row mb-2 align-items-center">
                         <div className="col-sm-6">
                             <h1>Gestión de Miembros</h1>
+                        </div>
+                        <div className="col-sm-6 text-sm-end">
+                            <button
+                                onClick={handleLogout} className="btn btn-outline-danger btn-sm">
+                                <i className="fa-solid fa-right-from-bracket me-2"></i> Cerrar Sesión
+                            </button>
                         </div>
                     </div>
                 </div>
