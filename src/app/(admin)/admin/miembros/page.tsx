@@ -168,18 +168,6 @@ export default function MiembrosPage() {
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            const response = await fetch('/api/auth/logout', { method: 'POST' });
-            const data = await response.json();
-
-            if (data.status === "exito") {
-                window.location.href = '/login';
-            }
-        } catch (error) {
-            console.error("Error al cerrar sesión:", error);
-        }
-    };
 
     const miembrosFiltrados = miembros.filter((m: any) =>
         m.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -220,19 +208,18 @@ export default function MiembrosPage() {
     return (
         <>
             <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" strategy="afterInteractive" />
-            <Script src="https://kit.fontawesome.com/f50be4e936.js" crossOrigin="anonymous" strategy="afterInteractive" />
 
-            <section className="content-header">
+            <section className="content-header mt-4 mb-3">
                 <div className="container-fluid">
-                    <div className="row mb-2 align-items-center">
-                        <div className="col-sm-6">
-                            <h1>Gestión de Miembros</h1>
-                        </div>
-                        <div className="col-sm-6 text-sm-end">
-                            <button
-                                onClick={handleLogout} className="btn btn-outline-danger btn-sm">
-                                <i className="fa-solid fa-right-from-bracket me-2"></i> Cerrar Sesión
-                            </button>
+                    <div className="row align-items-center">
+                        <div className="col-12">
+                            <div className="d-flex align-items-center gap-2 mb-1">
+                                <i className="fa-solid fa-users text-muted" style={{ fontSize: "24px", color: "#A8BBA3" }} />
+                                <h1 className="h2 fw-bold m-0 text-dark" style={{ fontFamily: "Outfit, sans-serif", letterSpacing: "-0.5px" }}>
+                                    Gestión de Miembros
+                                </h1>
+                            </div>
+                            <hr className="my-2 opacity-25" style={{ backgroundColor: "#2C3A2B", height: "1px", border: "none" }} />
                         </div>
                     </div>
                 </div>
@@ -538,7 +525,7 @@ export default function MiembrosPage() {
                     <div className="modal-dialog modal-dialog-centered modal-sm">
                         <div className="modal-content border-0 shadow-lg">
                             <div className="modal-header bg-danger text-white border-0">
-                                <h5 className="modal-title fw-bold">atencion!</h5>
+                                <h5 className="modal-title fw-bold">Advertencia!</h5>
                                 <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div className="modal-body text-center p-4">
