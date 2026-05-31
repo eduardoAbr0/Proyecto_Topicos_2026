@@ -40,7 +40,7 @@ export default function LoginPage() {
             const data = await res.json();
 
             if (data.status === 'exito') {
-                router.push('/admin/miembros');
+                router.push('/');
             } else {
                 mostrarToast(data.message, 'error');
                 recaptchaRef.current?.reset();

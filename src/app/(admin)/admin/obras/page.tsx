@@ -31,6 +31,8 @@ export default function ObrasPage() {
     // --- ESTADOS PARA EL TOAST ---
     const [toast, setToast] = useState({ mostrar: false, mensaje: '', tipo: 'exito' });
 
+    const [loading, setLoading] = useState(true);
+
     // --- CARGAR DATOS AL INICIO ---
     useEffect(() => {
         cargarObras();
@@ -48,6 +50,8 @@ export default function ObrasPage() {
         } catch (error) {
             console.error("Error al cargar obras:", error);
             mostrarToast("Error de conexión con el servidor", "error");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -184,6 +188,17 @@ export default function ObrasPage() {
         o.titulo?.toLowerCase().includes(busqueda.toLowerCase()) ||
         (o.autor || '').toLowerCase().includes(busqueda.toLowerCase())
     );
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+                <div className="text-center">
+                    <div className="spinner-border text-primary mb-3" role="status" style={{ width: '3rem', height: '3rem' }}></div>
+                    <p className="text-muted fw-bold">Cargando obras...</p>
+                </div>
+            </div>
+        );
+    }
 
     // --- CONFIGURACION DATATABLE --
     const columnas = [

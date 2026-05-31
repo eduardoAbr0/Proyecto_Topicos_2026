@@ -19,10 +19,6 @@ const IconBoletos = () => (
   <i className="fa-solid fa-ticket" style={{ fontSize: '20px' }} />
 );
 
-const IconReportes = () => (
-  <i className="fa-solid fa-chart-line" style={{ fontSize: '20px' }} />
-);
-
 const IconMenu = () => (
   <i className="fa-solid fa-bars" style={{ fontSize: '20px' }} />
 );
@@ -53,12 +49,7 @@ const navItems: NavItem[] = [
     name: "Finanzas",
     icon: <IconFinanzas />,
     path: "/admin/finanzas"
-  },
-  {
-    name: "Reportes",
-    icon: <IconReportes />,
-    path: "/admin/reportes"
-  },
+  }
 ];
 
 const SIDEBAR_BG = "#2C3A2B";   

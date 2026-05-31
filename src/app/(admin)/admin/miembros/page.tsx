@@ -33,6 +33,8 @@ export default function MiembrosPage() {
     // --- ESTADOS PARA EL TOAST ---
     const [toast, setToast] = useState({ mostrar: false, mensaje: '', tipo: 'exito' });
 
+    const [loading, setLoading] = useState(true);
+
     // --- CARGAR DATOS AL INICIO ---
     useEffect(() => {
         cargarMiembros();
@@ -49,6 +51,8 @@ export default function MiembrosPage() {
         } catch (error) {
             console.error("Error al cargar miembros:", error);
             mostrarToast("Error de conexión con el servidor", "error");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -174,6 +178,17 @@ export default function MiembrosPage() {
         m.primer_apellido.toLowerCase().includes(busqueda.toLowerCase())
     );
 
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+                <div className="text-center">
+                    <div className="spinner-border text-primary mb-3" role="status" style={{ width: '3rem', height: '3rem' }}></div>
+                    <p className="text-muted fw-bold">Cargando miembros...</p>
+                </div>
+            </div>
+        );
+    }
+
     // --- CONFIGURACION DATATABLE --
     const columnas = [
         { name: 'ID', selector: (row: any) => row.id_miembro, sortable: true, width: '80px' },
@@ -181,7 +196,7 @@ export default function MiembrosPage() {
         {
             name: 'Estado Membresía', selector: (row: any) => row.estado_membresia, sortable: true,
             cell: (row: any) => (
-                <span className={`badge ${row.estado_membresia === 'Pagada' ? 'bg-success' : 'bg-warning text-dark'}`}>
+                <span className={`badge fs-6 ${row.estado_membresia === 'Pagada' ? 'bg-success' : 'bg-warning text-dark'}`}>
                     {row.estado_membresia}
                 </span>
             )
