@@ -3,20 +3,47 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
     const tieneSesion = request.cookies.has('sesion_activa');
+    const rol = request.cookies.get('user_role')?.value;
     const { pathname } = request.nextUrl;
 
-    if (pathname.startsWith('/admin') && !tieneSesion) {
-        return NextResponse.redirect(new URL('/login', request.url));
+    if (pathname === '/login' || pathname === '/registro') {
+        if (tieneSesion) {
+            if (rol === 'Admin') {
+                return NextResponse.redirect(new URL('/admin/miembros', request.url));
+            } else if (rol === 'Cliente') {
+                return NextResponse.redirect(new URL('/comprar-boletos', request.url));
+            }
+        }
+        return NextResponse.next();
     }
 
+    if (pathname.startsWith('/admin')) {
+        if (!tieneSesion || rol !== 'Admin') {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+        return NextResponse.next();
+    }
 
-    if ((pathname === '/') && tieneSesion) {
-        return NextResponse.redirect(new URL('/admin/miembros', request.url));
+    if (pathname.startsWith('/comprar-boletos')) {
+        if (!tieneSesion || rol !== 'Cliente') {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+        return NextResponse.next();
+    }
+
+    if (pathname === '/') {
+        if (tieneSesion) {
+            if (rol === 'Admin') {
+                return NextResponse.redirect(new URL('/admin/miembros', request.url));
+            } else if (rol === 'Cliente') {
+                return NextResponse.redirect(new URL('/comprar-boletos', request.url));
+            }
+        }
     }
 
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/', '/login', '/admin/:path*'],
+    matcher: ['/', '/login', '/registro', '/admin/:path*', '/comprar-boletos'],
 };
