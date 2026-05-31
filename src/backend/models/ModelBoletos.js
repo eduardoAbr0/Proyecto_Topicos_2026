@@ -87,3 +87,9 @@ export async function mostrarBoletoDetalle(id) {
     const filas = await query(sql, [id]);
     return filas.length > 0 ? filas[0] : null;
 }
+
+export async function obtenerAsientosOcupados(idObra) {
+    const sql = "SELECT id_asiento FROM Boletos WHERE id_obra = ? AND estado IN ('Pagado', 'Reservado')";
+    const filas = await query(sql, [idObra]);
+    return filas.map(f => f.id_asiento);
+}
