@@ -21,7 +21,7 @@ export async function POST(request) {
         const response = NextResponse.json({ 
             status: "exito", 
             message: "Bienvenido!",
-            usuario: { nombre: usuario.nombre, email: usuario.email } 
+            usuario: { nombre: usuario.nombre, email: usuario.email, rol: usuario.rol} 
         });
 
         response.cookies.set({
@@ -31,7 +31,17 @@ export async function POST(request) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             path: '/',
-            maxAge: 60 * 5
+            maxAge: 60 * 5 * 10
+        });
+
+        response.cookies.set({
+            name: 'user_role',
+            value: usuario.rol ? usuario.rol : 'Cliente',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 60 * 5 * 10
         });
 
         return response;

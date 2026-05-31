@@ -8,6 +8,7 @@ export async function POST() {
         });
 
         response.cookies.delete('sesion_activa');
+        response.cookies.delete('user_role');
 
         return response;
     } catch (error) {
