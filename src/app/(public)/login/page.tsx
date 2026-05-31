@@ -33,6 +33,7 @@ export default function LoginPage() {
         try {
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password, recaptchaResponse })
             });
@@ -40,7 +41,9 @@ export default function LoginPage() {
             const data = await res.json();
 
             if (data.status === 'exito') {
-                router.push('/');
+                setTimeout(() => {
+                    router.push('/');
+                }, 100);
             } else {
                 mostrarToast(data.message, 'error');
                 recaptchaRef.current?.reset();

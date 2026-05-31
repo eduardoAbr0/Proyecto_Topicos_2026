@@ -28,8 +28,8 @@ export async function POST(request) {
             name: 'sesion_activa',
             value: String(usuario.id_usuario),
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'strict',
             path: '/',
             maxAge: 60 * 5 * 10
         });
@@ -38,8 +38,8 @@ export async function POST(request) {
             name: 'user_role',
             value: usuario.rol ? usuario.rol : 'Cliente',
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'strict',
             path: '/',
             maxAge: 60 * 5 * 10
         });
