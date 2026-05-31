@@ -16,16 +16,16 @@ export default function LandingPage() {
             />
             Pleasantville Theater Group
           </Link>
-          
+
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
             <span className="navbar-toggler-icon"></span>
           </button>
-          
+
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav ms-auto mb-2 me-2 mb-lg-0">
               <li className="nav-item">
-                <Link className="nav-link hover-underline-animation center" href="/mostrarMiembros">
-                  Miembros
+                <Link className="nav-link hover-underline-animation center" href="/comprar-boletos">
+                  Comprar boletos
                 </Link>
               </li>
             </ul>
@@ -37,8 +37,7 @@ export default function LandingPage() {
       </nav>
 
       <section id="landingP" className="position-relative w-100" style={{ height: '80vh' }}>
-        <Image 
-          id='imageL' 
+        <Image id='imageL'
           src="/assets/landindImg.png" 
           alt="Pleasantville landing image" 
           fill 
@@ -46,10 +45,7 @@ export default function LandingPage() {
           priority
         />
 
-        <div 
-          className="overlay position-relative w-100 h-100 d-flex align-items-center" 
-          style={{ zIndex: 1}} 
-        >
+        <div className="overlay position-relative w-100 h-100 d-flex align-items-center" style={{ zIndex: 1 }}>
           <div className="container text-start text-white">
             <div className="row">
               <div className="col-md-8 col-lg-6">
