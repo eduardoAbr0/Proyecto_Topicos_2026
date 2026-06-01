@@ -7,6 +7,8 @@ import {
     mostrarMiembroDetalle
 } from '@/backend/models/ModelMiembros';
 import { miembroSchema } from '@/schemas/miembroSchema';
+import { observer } from '@/backend/EventObserver';
+import '@/backend/observers/LogObserver';
 
 export async function GET(request) {
     try {
@@ -51,6 +53,13 @@ export async function POST(request) {
         }
 
         const nuevoId = await agregarMiembro(validacion.data);
+
+        observer.notify('miembro:crear', {
+            entidad: 'Miembro',
+            accion: 'CREAR',
+            id: nuevoId,
+            datos: validacion.data,
+        });
         return NextResponse.json({ status: "exito", message: "Miembro agregado con exito", id: nuevoId }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
@@ -83,6 +92,13 @@ export async function PUT(request) {
         }
 
         await cambioMiembro(id, validacion.data);
+
+        observer.notify('miembro:actualizar', {
+            entidad: 'Miembro',
+            accion: 'ACTUALIZAR',
+            id: id,
+            datos: validacion.data,
+        });
         return NextResponse.json({ status: "exito", message: "Miembro modificado con eexito" });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
@@ -93,6 +109,13 @@ export async function DELETE(request) {
     try {
         const { id_miembro } = await request.json();
         await eliminarMiembro(id_miembro);
+
+        observer.notify('miembro:eliminar', {
+            entidad: 'Miembro',
+            accion: 'ELIMINAR',
+            id: id_miembro,
+        });
+
         return NextResponse.json({ status: "exito", message: "Miembro eliminado con exito" });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });

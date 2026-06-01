@@ -7,6 +7,8 @@ import {
     mostrarObraDetalle
 } from '@/backend/models/ModelObras';
 import { obraSchema } from '@/schemas/obraSchema';
+import { observer } from '@/backend/EventObserver';
+import '@/backend/observers/LogObserver';
 
 export async function GET(request) {
     try {
@@ -48,6 +50,14 @@ export async function POST(request) {
         }
 
         const nuevoId = await agregarObra(validacion.data);
+
+        observer.notify('obra:crear', {
+            entidad: 'Obra',
+            accion: 'CREAR',
+            id: nuevoId,
+            datos: validacion.data,
+        });
+
         return NextResponse.json({ status: "exito", message: "Obra agregada con exito", id: nuevoId }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
@@ -79,6 +89,14 @@ export async function PUT(request) {
         }
 
         await cambioObra(id, validacion.data);
+
+        observer.notify('obra:actualizar', {
+            entidad: 'Obra',
+            accion:  'ACTUALIZAR',
+            id,
+            datos:   validacion.data,
+        });
+
         return NextResponse.json({ status: "exito", message: "Obra modificada con exito" });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
@@ -89,6 +107,13 @@ export async function DELETE(request) {
     try {
         const { id_obra } = await request.json();
         await eliminarObra(id_obra);
+
+        observer.notify('obra:eliminar', {
+            entidad: 'Obra',
+            accion: 'ELIMINAR',
+            id: id_obra,
+        });
+
         return NextResponse.json({ status: "exito", message: "Obra eliminada con exito" });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
