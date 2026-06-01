@@ -6,6 +6,18 @@ export function middleware(request: NextRequest) {
     const rol = request.cookies.get('user_role')?.value;
     const { pathname } = request.nextUrl;
 
+    if (pathname.startsWith('/api/admin')) {
+        const esAdminRoute = pathname.startsWith('/api/admin');
+
+        if (!tieneSesion || (esAdminRoute && rol !== 'Admin')) {
+            return NextResponse.json(
+                { status: "error", message: "Sesion no autorizada." },
+                { status: 401 }
+            );
+        }
+        return NextResponse.next();
+    }
+
     if (pathname === '/login' || pathname === '/registro') {
         if (tieneSesion) {
             if (rol === 'Admin') {
@@ -45,5 +57,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/', '/login', '/registro', '/admin/:path*', '/comprar-boletos'],
+    matcher: ['/', '/login', '/registro', '/admin/:path*', '/comprar-boletos', '/api/:path*'],
 };
