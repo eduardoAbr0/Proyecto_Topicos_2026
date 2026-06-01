@@ -1,10 +1,30 @@
 import { NextResponse } from 'next/server';
 import { obtenerUsuarioPorUsername } from '@/backend/models/ModelUsuarios';
-import bcrypt from 'bcryptjs'; 
+import bcrypt from 'bcryptjs';
 
 export async function POST(request) {
     try {
-        const { username, password } = await request.json();
+        const { username, password, turnstileToken } = await request.json();
+
+        const turnstileValidation = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                secret: process.env.CLOUDFLARE_SECRET_KEY,
+                response: turnstileToken,
+            }),
+        });
+
+        const turnstileData = await turnstileValidation.json();
+
+        if (!turnstileData.success) {
+            return NextResponse.json(
+                { status: "error", message: "Validación de captcha fallida" },
+                { status: 400 }
+            );
+        }
 
         const usuario = await obtenerUsuarioPorUsername(username);
 
@@ -18,10 +38,10 @@ export async function POST(request) {
             return NextResponse.json({ status: "error", message: "Usuario o contraseña incorrectos" }, { status: 401 });
         }
 
-        const response = NextResponse.json({ 
-            status: "exito", 
+        const response = NextResponse.json({
+            status: "exito",
             message: "Bienvenido!",
-            usuario: { nombre: usuario.nombre, email: usuario.email, rol: usuario.rol} 
+            usuario: { nombre: usuario.nombre, email: usuario.email, rol: usuario.rol }
         });
 
         response.cookies.set({

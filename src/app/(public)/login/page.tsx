@@ -3,13 +3,13 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import ReCAPTCHA from 'react-google-recaptcha';
+import Turnstile from 'react-turnstile';
 import Script from 'next/script';
 import Image from 'next/image';
 
 export default function LoginPage() {
     const router = useRouter();
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
+    const turnstileRef = useRef<string>('');
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -23,10 +23,8 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const recaptchaResponse = recaptchaRef.current?.getValue();
-
-        if (!recaptchaResponse) {
-            mostrarToast('Por favor completa el reCAPTCHA', 'error');
+        if (!turnstileRef.current) {
+            mostrarToast('Por favor completa el captcha', 'error');
             return;
         }
 
@@ -35,7 +33,7 @@ export default function LoginPage() {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, recaptchaResponse })
+                body: JSON.stringify({ username, password, turnstileToken: turnstileRef.current })
             });
 
             const data = await res.json();
@@ -46,11 +44,9 @@ export default function LoginPage() {
                 }, 100);
             } else {
                 mostrarToast(data.message, 'error');
-                recaptchaRef.current?.reset();
             }
         } catch (error) {
             mostrarToast('Error en el servidor', 'error');
-            recaptchaRef.current?.reset();
         }
     };
 
@@ -100,9 +96,20 @@ export default function LoginPage() {
                                     </div>
 
                                     <div className="mb-3 d-flex justify-content-center">
-                                        <ReCAPTCHA
-                                            ref={recaptchaRef}
-                                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_KEY!}
+                                        <Turnstile
+                                            sitekey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITEKEY!}
+                                            onSuccess={(token) => {
+                                                turnstileRef.current = token;
+                                                console.log('✅ Turnstile completado');
+                                            }}
+                                            onError={() => {
+                                                turnstileRef.current = '';
+                                                console.log('Error en Turnstile');
+                                            }}
+                                            onExpire={() => {
+                                                turnstileRef.current = '';
+                                                console.log('Turnstile expiró');
+                                            }}
                                         />
                                     </div>
 
