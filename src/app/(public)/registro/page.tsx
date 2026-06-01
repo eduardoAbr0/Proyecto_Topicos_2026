@@ -12,6 +12,7 @@ export default function RegistroPage() {
     const [formData, setFormData] = useState({
         nombre: '', email: '', username: '', password: ''
     });
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [toast, setToast] = useState({ mostrar: false, mensaje: '', tipo: 'exito' });
 
     const mostrarToast = (mensaje: string, tipo: string) => {
@@ -25,6 +26,16 @@ export default function RegistroPage() {
 
     const handleRegistro = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (formData.password !== confirmPassword) {
+            mostrarToast('Las contraseñas no coinciden', 'error');
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            mostrarToast('La contraseña debe tener al menos 6 caracteres', 'error');
+            return;
+        }
 
         try {
             const res = await fetch('/api/auth/registro', {
@@ -94,6 +105,10 @@ export default function RegistroPage() {
                                     <div className="mb-3">
                                         <label htmlFor="password" className="form-label">Contraseña</label>
                                         <input type="password" className="form-control" id="password" name="password" required onChange={handleChange} value={formData.password} />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
+                                        <input type="password" className="form-control" id="confirmPassword" name="confirmPassword" required onChange={(e) => setConfirmPassword(e.target.value)} value={confirmPassword} />
                                     </div>
                                     <div className="d-grid gap-2">
                                         <button type="submit" className="btn btn-primary">Registrarse</button>
