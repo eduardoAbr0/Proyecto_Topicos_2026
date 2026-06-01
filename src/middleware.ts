@@ -8,8 +8,9 @@ export function middleware(request: NextRequest) {
 
     if (pathname.startsWith('/api/admin')) {
         const esAdminRoute = pathname.startsWith('/api/admin');
+        const esGetObras = pathname === '/api/admin/obras' && request.method === 'GET';
 
-        if (!tieneSesion || (esAdminRoute && rol !== 'Admin')) {
+        if (!tieneSesion || (esAdminRoute && !esGetObras && rol !== 'Admin')) {
             return NextResponse.json(
                 { status: "error", message: "Sesion no autorizada." },
                 { status: 401 }

@@ -39,9 +39,11 @@ export default function LoginPage() {
             const data = await res.json();
 
             if (data.status === 'exito') {
+                mostrarToast('Inicio de sesion correcto! Redireccionando...', 'exito');
                 setTimeout(() => {
-                    router.push('/');
-                }, 100);
+                    const destino = data.usuario.rol === 'Admin' ? '/admin/miembros' : '/comprar-boletos';
+                    window.location.href = destino;
+                }, 1000);
             } else {
                 mostrarToast(data.message, 'error');
             }
@@ -100,7 +102,7 @@ export default function LoginPage() {
                                             sitekey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITEKEY!}
                                             onSuccess={(token) => {
                                                 turnstileRef.current = token;
-                                                console.log('✅ Turnstile completado');
+                                                console.log('Turnstile completado');
                                             }}
                                             onError={() => {
                                                 turnstileRef.current = '';
