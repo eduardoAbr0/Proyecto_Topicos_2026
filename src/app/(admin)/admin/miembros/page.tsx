@@ -10,6 +10,7 @@ import {
     actualizarMiembro,
     eliminarMiembro
 } from '@/services/miembrosService';
+import { miembroSchema } from '@/schemas/miembroSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
     ssr: false,
@@ -90,6 +91,28 @@ export default function MiembrosPage() {
     const handleAgregar = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+        
+        const datosMiembro = {
+            nombre: formData.get('formNombre') as string,
+            primer_apellido: formData.get('formPrimerAp') as string,
+            segundo_apellido: formData.get('formSegundoAp') as string,
+            telefono: formData.get('formTelefono') as string,
+            email: formData.get('formEmail') as string,
+            numero_casa: formData.get('formNumCasa') as string,
+            calle: formData.get('formCalle') as string,
+            colonia: formData.get('formColonia') as string,
+            cp: formData.get('formCP') as string,
+            estado_membresia: formData.get('formEstadoMembresia') as string,
+            fecha_pago_cuota: formData.get('formFechaPago') === '' ? null : formData.get('formFechaPago') as string,
+        };
+
+        const validacion = miembroSchema.safeParse(datosMiembro);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
+
         try {
             const data = await crearMiembro(formData);
             if (data.status === "exito") {
@@ -123,6 +146,28 @@ export default function MiembrosPage() {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const formDataObj = Object.fromEntries(formData.entries());
+        
+        const datosMiembro = {
+            nombre: formDataObj.formNombreModificar as string,
+            primer_apellido: formDataObj.formPrimerApModificar as string,
+            segundo_apellido: formDataObj.formSegundoApModificar as string,
+            telefono: formDataObj.formTelefonoModificar as string,
+            email: formDataObj.formEmailModificar as string,
+            numero_casa: formDataObj.formNumCasaModificar as string,
+            calle: formDataObj.formCalleModificar as string,
+            colonia: formDataObj.formColoniaModificar as string,
+            cp: formDataObj.formCPModificar as string,
+            estado_membresia: formDataObj.formEstadoMembresiaModificar as string,
+            fecha_pago_cuota: formDataObj.formFechaPagoModificar === '' ? null : formDataObj.formFechaPagoModificar as string,
+        };
+
+        const validacion = miembroSchema.safeParse(datosMiembro);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
+
         try {
             const data = await actualizarMiembro(formDataObj);
             if (data.status === "exito") {

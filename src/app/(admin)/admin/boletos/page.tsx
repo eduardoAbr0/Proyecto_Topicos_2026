@@ -12,6 +12,7 @@ import {
 } from '@/services/boletosService';
 import { obtenerUsuarios } from '@/services/usuariosService';
 import { obtenerObras } from '@/services/obrasService';
+import { boletoSchema } from '@/schemas/boletoSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
     ssr: false,
@@ -109,6 +110,23 @@ export default function BoletosPage() {
     const handleAgregar = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+
+        const datosBoleto = {
+            id_usuario: formData.get('formUsuario') as string,
+            id_asiento: formData.get('formAsiento') as string,
+            id_obra: formData.get('formObra') as string,
+            precio: formData.get('formPrecio') as string,
+            fecha_compra: formData.get('formFechaCompra') as string,
+            estado: formData.get('formEstado') as string,
+        };
+
+        const validacion = boletoSchema.safeParse(datosBoleto);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
+
         try {
             const data = await crearBoleto(formData);
             if (data.status === "exito") {
@@ -144,6 +162,23 @@ export default function BoletosPage() {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const formDataObj = Object.fromEntries(formData.entries());
+
+        const datosBoleto = {
+            id_usuario: formDataObj.formUsuarioModificar as string,
+            id_asiento: formDataObj.formAsientoModificar as string,
+            id_obra: formDataObj.formObraModificar as string,
+            precio: formDataObj.formPrecioModificar as string,
+            fecha_compra: formDataObj.formFechaCompraModificar as string,
+            estado: formDataObj.formEstadoModificar as string,
+        };
+
+        const validacion = boletoSchema.safeParse(datosBoleto);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
+
         try {
             const data = await actualizarBoleto(formDataObj);
             if (data.status === "exito") {

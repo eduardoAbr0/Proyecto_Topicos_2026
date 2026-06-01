@@ -11,6 +11,7 @@ import {
     eliminarFinanza
 } from '@/services/finanzasService';
 import { obtenerObras } from '@/services/obrasService';
+import { finanzaSchema } from '@/schemas/finanzaSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
     ssr: false,
@@ -102,6 +103,22 @@ export default function FinanzasPage() {
     const handleAgregar = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+
+        const datosFinanza = {
+            fecha: formData.get('formFecha') as string,
+            tipo: formData.get('formTipo') as string,
+            concepto: formData.get('formConcepto') as string,
+            monto: formData.get('formMonto') as string,
+            id_obra: formData.get('formObra') === '' ? null : formData.get('formObra') as string,
+        };
+
+        const validacion = finanzaSchema.safeParse(datosFinanza);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
+
         try {
             const data = await crearFinanza(formData);
             if (data.status === "exito") {
@@ -136,6 +153,21 @@ export default function FinanzasPage() {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const formDataObj = Object.fromEntries(formData.entries());
+
+        const datosFinanza = {
+            fecha: formDataObj.formFechaModificar as string,
+            tipo: formDataObj.formTipoModificar as string,
+            concepto: formDataObj.formConceptoModificar as string,
+            monto: formDataObj.formMontoModificar as string,
+            id_obra: formDataObj.formObraModificar === '' ? null : formDataObj.formObraModificar as string,
+        };
+
+        const validacion = finanzaSchema.safeParse(datosFinanza);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
 
         try {
             const data = await actualizarFinanza(formDataObj);

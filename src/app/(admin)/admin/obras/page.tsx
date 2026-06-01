@@ -11,6 +11,7 @@ import {
     eliminarObra
 } from '@/services/obrasService';
 import { obtenerMiembros } from '@/services/miembrosService';
+import { obraSchema } from '@/schemas/obraSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
     ssr: false,
@@ -100,6 +101,25 @@ export default function ObrasPage() {
     const handleAgregar = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+
+        const datosObra = {
+            titulo: formData.get('formTitulo') as string,
+            autor: formData.get('formAutor') === '' ? null : formData.get('formAutor') as string,
+            tipo: formData.get('formTipo') === '' ? null : formData.get('formTipo') as string,
+            num_actos: formData.get('formNumActos') === '' ? null : formData.get('formNumActos') as string,
+            anio_presentacion: formData.get('formAnioPresentacion') === '' ? null : formData.get('formAnioPresentacion') as string,
+            temporada: formData.get('formTemporada') === '' ? null : formData.get('formTemporada') as string,
+            productor: formData.get('formProductor') === '' ? null : formData.get('formProductor') as string,
+            descripcion: formData.get('formDescripcion') === '' ? null : formData.get('formDescripcion') as string,
+        };
+
+        const validacion = obraSchema.safeParse(datosObra);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
+
         try {
             const data = await crearObra(formData);
             if (data.status === "exito") {
@@ -134,6 +154,24 @@ export default function ObrasPage() {
         const formDataObj = Object.fromEntries(formData.entries());
 
         console.log('OBJETO ANTES DE ACTUALIZAR> ',formDataObj);
+
+        const datosObra = {
+            titulo: formDataObj.formTituloModificar as string,
+            autor: formDataObj.formAutorModificar === '' ? null : formDataObj.formAutorModificar as string,
+            tipo: formDataObj.formTipoModificar === '' ? null : formDataObj.formTipoModificar as string,
+            num_actos: formDataObj.formNumActosModificar === '' ? null : formDataObj.formNumActosModificar as string,
+            anio_presentacion: formDataObj.formAnioPresentacionModificar === '' ? null : formDataObj.formAnioPresentacionModificar as string,
+            temporada: formDataObj.formTemporadaModificar === '' ? null : formDataObj.formTemporadaModificar as string,
+            productor: formDataObj.formProductorModificar === '' ? null : formDataObj.formProductorModificar as string,
+            descripcion: formDataObj.formDescripcionModificar === '' ? null : formDataObj.formDescripcionModificar as string,
+        };
+
+        const validacion = obraSchema.safeParse(datosObra);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
 
         try {
             const data = await actualizarObra(formDataObj);

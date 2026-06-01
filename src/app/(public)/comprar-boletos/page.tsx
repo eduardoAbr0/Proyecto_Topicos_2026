@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { obtenerObras } from '@/services/obrasService';
+import { boletoSchema } from '@/schemas/boletoSchema';
 
 export default function ComprarBoletosPage() {
     const [obras, setObras] = useState<any[]>([]);
@@ -63,6 +64,22 @@ export default function ComprarBoletosPage() {
 
     const handleComprar = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const datosBoleto = {
+            id_usuario: "1", // Mock para validar la estructura en el cliente (el backend usará el ID real de la cookie)
+            id_asiento: asiento,
+            id_obra: idObra,
+            precio: categoria,
+            fecha_compra: new Date().toISOString().split('T')[0],
+            estado: medio
+        };
+
+        const validacion = boletoSchema.safeParse(datosBoleto);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(err => err.message).join(', ');
+            mostrarToast(`Verifica los campos: ${errores}`, "error");
+            return;
+        }
 
         try {
             const response = await fetch('/api/boletos/comprar', {
