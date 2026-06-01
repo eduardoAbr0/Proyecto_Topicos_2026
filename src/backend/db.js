@@ -29,6 +29,12 @@ export async function query(sql, params) {
         return results;
     } catch (error) {
         console.error("ERROR EN CONEXION A BD:", error.message);
-        throw error;
+        let mensajeUsuario = "Hubo una falla en la base de datos";
+        if (error.message.includes('ECONNRESET') || error.code === 'ECONNRESET') {
+            mensajeUsuario = "Base de datos no disponible, intentelo de nuevo";
+        }
+        const dbError = new Error(mensajeUsuario);
+        dbError.code = error.code;
+        throw dbError;
     }
 }
