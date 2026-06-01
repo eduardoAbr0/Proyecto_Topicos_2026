@@ -3,14 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
-import {
-    obtenerFinanzas,
-    obtenerFinanzaPorId,
-    crearFinanza,
-    actualizarFinanza,
-    eliminarFinanza
-} from '@/services/finanzasService';
-import { obtenerObras } from '@/services/obrasService';
+import { adminFacade } from '@/services/AdminFacade';
 import { finanzaSchema } from '@/schemas/finanzaSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
@@ -44,7 +37,7 @@ export default function FinanzasPage() {
 
     const cargarFinanzas = async () => {
         try {
-            const data = await obtenerFinanzas();
+            const data = await adminFacade.obtenerFinanzas();
             if (Array.isArray(data)) {
                 setFinanzas(data);
             } else if (data.status === "error" || data.error) {
@@ -60,7 +53,7 @@ export default function FinanzasPage() {
 
     const cargarObrasSelect = async () => {
         try {
-            const data = await obtenerObras();
+            const data = await adminFacade.obtenerObras();
             if (Array.isArray(data)) {
                 setObras(data);
             }
@@ -120,7 +113,7 @@ export default function FinanzasPage() {
         }
 
         try {
-            const data = await crearFinanza(formData);
+            const data = await adminFacade.crearFinanza(formData);
             if (data.status === "exito") {
                 cargarFinanzas();
                 mostrarToast(data.message, "exito");
@@ -136,7 +129,7 @@ export default function FinanzasPage() {
     };
 
     const handleModificarMostrar = async (id: number) => {
-        const data = await obtenerFinanzaPorId(id);
+        const data = await adminFacade.obtenerFinanzaPorId(id);
         if (!data.error) {
             if (data.fecha) {
                 data.fecha = data.fecha.split('T')[0];
@@ -170,7 +163,7 @@ export default function FinanzasPage() {
         }
 
         try {
-            const data = await actualizarFinanza(formDataObj);
+            const data = await adminFacade.actualizarFinanza(formDataObj);
             if (data.status === "exito") {
                 cargarFinanzas();
                 mostrarToast(data.message, "exito");
@@ -193,7 +186,7 @@ export default function FinanzasPage() {
     const handleEliminarConfirmar = async () => {
         if (!finanzaSeleccionada) return;
         try {
-            const data = await eliminarFinanza(finanzaSeleccionada.id_finanza);
+            const data = await adminFacade.eliminarFinanza(finanzaSeleccionada.id_finanza);
             if (data.status === "exito") {
                 cargarFinanzas();
                 mostrarToast(data.message, "exito");
@@ -208,7 +201,7 @@ export default function FinanzasPage() {
     };
 
     const handleDetalle = async (id: number) => {
-        const data = await obtenerFinanzaPorId(id);
+        const data = await adminFacade.obtenerFinanzaPorId(id);
         if (!data.error) {
             setFinanzaSeleccionada(data);
             const modal = new (window as any).bootstrap.Modal(document.getElementById("modalDetalleFinanza"));

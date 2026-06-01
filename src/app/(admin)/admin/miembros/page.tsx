@@ -3,13 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
-import {
-    obtenerMiembros,
-    obtenerMiembroPorId,
-    crearMiembro,
-    actualizarMiembro,
-    eliminarMiembro
-} from '@/services/miembrosService';
+import { adminFacade } from '@/services/AdminFacade';
 import { miembroSchema } from '@/schemas/miembroSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
@@ -43,7 +37,7 @@ export default function MiembrosPage() {
 
     const cargarMiembros = async () => {
         try {
-            const data = await obtenerMiembros();
+            const data = await adminFacade.obtenerMiembros();
             if (Array.isArray(data)) {
                 setMiembros(data);
             } else if (data.status === "error" || data.error) {
@@ -114,7 +108,7 @@ export default function MiembrosPage() {
         }
 
         try {
-            const data = await crearMiembro(formData);
+            const data = await adminFacade.crearMiembro(formData);
             if (data.status === "exito") {
                 cargarMiembros();
                 mostrarToast(data.message, "exito");
@@ -130,7 +124,7 @@ export default function MiembrosPage() {
     };
 
     const handleModificarMostrar = async (id: number) => {
-        const data = await obtenerMiembroPorId(id);
+        const data = await adminFacade.obtenerMiembroPorId(id);
         if (!data.error) {
             setMiembroSeleccionado(data);
             setEstadoMembresiaModificar(data.estado_membresia);
@@ -169,7 +163,7 @@ export default function MiembrosPage() {
         }
 
         try {
-            const data = await actualizarMiembro(formDataObj);
+            const data = await adminFacade.actualizarMiembro(formDataObj);
             if (data.status === "exito") {
                 cargarMiembros();
                 mostrarToast(data.message, "exito");
@@ -192,7 +186,7 @@ export default function MiembrosPage() {
     const handleEliminarConfirmar = async () => {
         if (!miembroSeleccionado) return;
         try {
-            const data = await eliminarMiembro(miembroSeleccionado.id_miembro);
+            const data = await adminFacade.eliminarMiembro(miembroSeleccionado.id_miembro);
             if (data.status === "exito") {
                 cargarMiembros();
                 mostrarToast(data.message, "exito");
@@ -207,7 +201,7 @@ export default function MiembrosPage() {
     };
 
     const handleDetalle = async (id: number) => {
-        const data = await obtenerMiembroPorId(id);
+        const data = await adminFacade.obtenerMiembroPorId(id);
         if (!data.error) {
             setMiembroSeleccionado(data);
             const modal = new (window as any).bootstrap.Modal(document.getElementById("modalDetalleMiembro"));

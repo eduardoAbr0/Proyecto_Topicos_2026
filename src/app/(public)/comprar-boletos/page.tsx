@@ -66,7 +66,7 @@ export default function ComprarBoletosPage() {
         e.preventDefault();
 
         const datosBoleto = {
-            id_usuario: "1", // Mock para validar la estructura en el cliente (el backend usará el ID real de la cookie)
+            id_usuario: "1",
             id_asiento: asiento,
             id_obra: idObra,
             precio: categoria,

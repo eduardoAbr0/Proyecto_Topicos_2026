@@ -3,15 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
-import {
-    obtenerBoletos,
-    obtenerBoletoPorId,
-    crearBoleto,
-    actualizarBoleto,
-    eliminarBoleto
-} from '@/services/boletosService';
-import { obtenerUsuarios } from '@/services/usuariosService';
-import { obtenerObras } from '@/services/obrasService';
+import { adminFacade } from '@/services/AdminFacade';
 import { boletoSchema } from '@/schemas/boletoSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
@@ -49,7 +41,7 @@ export default function BoletosPage() {
 
     const cargarBoletos = async () => {
         try {
-            const data = await obtenerBoletos();
+            const data = await adminFacade.obtenerBoletos();
             if (Array.isArray(data)) {
                 setBoletos(data);
             } else if (data.status === "error" || data.error) {
@@ -66,8 +58,8 @@ export default function BoletosPage() {
     const cargarDatosRelacionales = async () => {
         try {
             const [resUsuarios, resObras] = await Promise.all([
-                obtenerUsuarios(),
-                obtenerObras()
+                adminFacade.obtenerUsuarios(),
+                adminFacade.obtenerObras()
             ]);
             if (Array.isArray(resUsuarios)) setUsuarios(resUsuarios);
             if (Array.isArray(resObras)) setObras(resObras);
@@ -128,7 +120,7 @@ export default function BoletosPage() {
         }
 
         try {
-            const data = await crearBoleto(formData);
+            const data = await adminFacade.crearBoleto(formData);
             if (data.status === "exito") {
                 cargarBoletos();
                 mostrarToast(data.message, "exito");
@@ -144,7 +136,7 @@ export default function BoletosPage() {
     };
 
     const handleModificarMostrar = async (id: number) => {
-        const data = await obtenerBoletoPorId(id);
+        const data = await adminFacade.obtenerBoletoPorId(id);
         if (!data.error) {
             if (data.fecha_compra) {
                 data.fecha_compra = data.fecha_compra.split('T')[0];
@@ -180,7 +172,7 @@ export default function BoletosPage() {
         }
 
         try {
-            const data = await actualizarBoleto(formDataObj);
+            const data = await adminFacade.actualizarBoleto(formDataObj);
             if (data.status === "exito") {
                 cargarBoletos();
                 mostrarToast(data.message, "exito");
@@ -203,7 +195,7 @@ export default function BoletosPage() {
     const handleEliminarConfirmar = async () => {
         if (!boletoSeleccionado) return;
         try {
-            const data = await eliminarBoleto(boletoSeleccionado.id_boleto);
+            const data = await adminFacade.eliminarBoleto(boletoSeleccionado.id_boleto);
             if (data.status === "exito") {
                 cargarBoletos();
                 mostrarToast(data.message, "exito");
@@ -218,7 +210,7 @@ export default function BoletosPage() {
     };
 
     const handleDetalle = async (id: number) => {
-        const data = await obtenerBoletoPorId(id);
+        const data = await adminFacade.obtenerBoletoPorId(id);
         if (!data.error) {
             if (data.fecha_compra) {
                 data.fecha_compra = data.fecha_compra.split('T')[0];

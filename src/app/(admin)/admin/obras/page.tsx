@@ -3,14 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
-import {
-    obtenerObras,
-    obtenerObraPorId,
-    crearObra,
-    actualizarObra,
-    eliminarObra
-} from '@/services/obrasService';
-import { obtenerMiembros } from '@/services/miembrosService';
+import { adminFacade } from '@/services/AdminFacade';
 import { obraSchema } from '@/schemas/obraSchema';
 
 const DataTable = dynamic(() => import('react-data-table-component'), {
@@ -42,7 +35,7 @@ export default function ObrasPage() {
 
     const cargarObras = async () => {
         try {
-            const data = await obtenerObras();
+            const data = await adminFacade.obtenerObras();
             if (Array.isArray(data)) {
                 setObras(data);
             } else if (data.status === "error" || data.error) {
@@ -58,7 +51,7 @@ export default function ObrasPage() {
 
     const cargarMiembrosSelect = async () => {
         try {
-            const data = await obtenerMiembros();
+            const data = await adminFacade.obtenerMiembros();
             if (Array.isArray(data)) {
                 setMiembros(data);
             }
@@ -121,7 +114,7 @@ export default function ObrasPage() {
         }
 
         try {
-            const data = await crearObra(formData);
+            const data = await adminFacade.crearObra(formData);
             if (data.status === "exito") {
                 cargarObras();
                 mostrarToast(data.message, "exito");
@@ -137,7 +130,7 @@ export default function ObrasPage() {
     };
 
     const handleModificarMostrar = async (id: number) => {
-        const data = await obtenerObraPorId(id);
+        const data = await adminFacade.obtenerObraPorId(id);
         console.log('DATA HANDLE MODIFICAR MOSTRAR', data);
         if (!data.error) {
             setObraSeleccionada(data);
@@ -174,7 +167,7 @@ export default function ObrasPage() {
         }
 
         try {
-            const data = await actualizarObra(formDataObj);
+            const data = await adminFacade.actualizarObra(formDataObj);
             if (data.status === "exito") {
                 cargarObras();
                 mostrarToast(data.message, "exito");
@@ -197,7 +190,7 @@ export default function ObrasPage() {
     const handleEliminarConfirmar = async () => {
         if (!obraSeleccionada) return;
         try {
-            const data = await eliminarObra(obraSeleccionada.id_obra);
+            const data = await adminFacade.eliminarObra(obraSeleccionada.id_obra);
             if (data.status === "exito") {
                 cargarObras();
                 mostrarToast(data.message, "exito");
@@ -212,7 +205,7 @@ export default function ObrasPage() {
     };
 
     const handleDetalle = async (id: number) => {
-        const data = await obtenerObraPorId(id);
+        const data = await adminFacade.obtenerObraPorId(id);
         if (!data.error) {
             setObraSeleccionada(data);
             const modal = new (window as any).bootstrap.Modal(document.getElementById("modalDetalleObra"));
