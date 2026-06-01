@@ -6,6 +6,7 @@ import {
     eliminarMiembro,
     mostrarMiembroDetalle
 } from '@/backend/models/ModelMiembros';
+import { miembroSchema } from '@/schemas/miembroSchema';
 
 export async function GET(request) {
     try {
@@ -40,10 +41,16 @@ export async function POST(request) {
             colonia: formData.get('formColonia'),
             cp: formData.get('formCP'),
             estado_membresia: formData.get('formEstadoMembresia'),
-            fecha_pago_cuota: formData.get('formFechaPago'),
+            fecha_pago_cuota: formData.get('formFechaPago') === '' ? null : formData.get('formFechaPago'),
         };
 
-        const nuevoId = await agregarMiembro(datosMiembro);
+        const validacion = miembroSchema.safeParse(datosMiembro);
+        if (!validacion.success) {
+            const errores = validacion.error.errors.map(e => e.message).join(', ');
+            return NextResponse.json({ status: "error", message: `Error de validación: ${errores}` }, { status: 400 });
+        }
+
+        const nuevoId = await agregarMiembro(validacion.data);
         return NextResponse.json({ status: "exito", message: "Miembro agregado con exito", id: nuevoId }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
@@ -66,10 +73,16 @@ export async function PUT(request) {
             colonia: datosRaw.formColoniaModificar,
             cp: datosRaw.formCPModificar,
             estado_membresia: datosRaw.formEstadoMembresiaModificar,
-            fecha_pago_cuota: datosRaw.formFechaPagoModificar,
+            fecha_pago_cuota: datosRaw.formFechaPagoModificar === '' ? null : datosRaw.formFechaPagoModificar,
         };
 
-        await cambioMiembro(id, datosMiembro);
+        const validacion = miembroSchema.safeParse(datosMiembro);
+        if (!validacion.success) {
+            const errores = validacion.error.errors.map(e => e.message).join(', ');
+            return NextResponse.json({ status: "error", message: `Error de validación: ${errores}` }, { status: 400 });
+        }
+
+        await cambioMiembro(id, validacion.data);
         return NextResponse.json({ status: "exito", message: "Miembro modificado con eexito" });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });

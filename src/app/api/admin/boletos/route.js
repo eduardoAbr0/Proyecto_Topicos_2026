@@ -6,6 +6,7 @@ import {
     eliminarBoleto,
     mostrarBoletoDetalle
 } from '@/backend/models/ModelBoletos';
+import { boletoSchema } from '@/schemas/boletoSchema';
 
 export async function GET(request) {
     try {
@@ -30,15 +31,21 @@ export async function POST(request) {
         const formData = await request.formData();
 
         const datosBoleto = {
-            id_usuario: formData.get('formUsuario'),
-            id_asiento: formData.get('formAsiento'),
-            id_obra: formData.get('formObra'),
-            precio: formData.get('formPrecio'),
-            fecha_compra: formData.get('formFechaCompra'),
-            estado: formData.get('formEstado'),
+            id_usuario: formData.get('formUsuario') === '' ? null : formData.get('formUsuario'),
+            id_asiento: formData.get('formAsiento') === '' ? null : formData.get('formAsiento'),
+            id_obra: formData.get('formObra') === '' ? null : formData.get('formObra'),
+            precio: formData.get('formPrecio') === '' ? null : formData.get('formPrecio'),
+            fecha_compra: formData.get('formFechaCompra') === '' ? null : formData.get('formFechaCompra'),
+            estado: formData.get('formEstado') === '' ? null : formData.get('formEstado'),
         };
 
-        const nuevoId = await agregarBoleto(datosBoleto);
+        const validacion = boletoSchema.safeParse(datosBoleto);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(e => e.message).join(', ');
+            return NextResponse.json({ status: "error", message: `Error de validación: ${errores}` }, { status: 400 });
+        }
+
+        const nuevoId = await agregarBoleto(validacion.data);
         return NextResponse.json({ status: "exito", message: "Boleto agregado con exito", id: nuevoId }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
@@ -51,15 +58,21 @@ export async function PUT(request) {
         const id = datosRaw.formId;
 
         const datosBoleto = {
-            id_usuario: datosRaw.formUsuarioModificar,
-            id_asiento: datosRaw.formAsientoModificar,
-            id_obra: datosRaw.formObraModificar,
-            precio: datosRaw.formPrecioModificar,
-            fecha_compra: datosRaw.formFechaCompraModificar,
-            estado: datosRaw.formEstadoModificar,
+            id_usuario: datosRaw.formUsuarioModificar === '' ? null : datosRaw.formUsuarioModificar,
+            id_asiento: datosRaw.formAsientoModificar === '' ? null : datosRaw.formAsientoModificar,
+            id_obra: datosRaw.formObraModificar === '' ? null : datosRaw.formObraModificar,
+            precio: datosRaw.formPrecioModificar === '' ? null : datosRaw.formPrecioModificar,
+            fecha_compra: datosRaw.formFechaCompraModificar === '' ? null : datosRaw.formFechaCompraModificar,
+            estado: datosRaw.formEstadoModificar === '' ? null : datosRaw.formEstadoModificar,
         };
 
-        await cambioBoleto(id, datosBoleto);
+        const validacion = boletoSchema.safeParse(datosBoleto);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(e => e.message).join(', ');
+            return NextResponse.json({ status: "error", message: `Error de validación: ${errores}` }, { status: 400 });
+        }
+
+        await cambioBoleto(id, validacion.data);
         return NextResponse.json({ status: "exito", message: "Boleto modificado con exito" });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });

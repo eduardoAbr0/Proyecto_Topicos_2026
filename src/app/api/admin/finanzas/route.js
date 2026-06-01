@@ -6,6 +6,7 @@ import {
     eliminarFinanza,
     mostrarFinanzaDetalle
 } from '@/backend/models/ModelFinanzas';
+import { finanzaSchema } from '@/schemas/finanzaSchema';
 
 export async function GET(request) {
     try {
@@ -34,10 +35,16 @@ export async function POST(request) {
             tipo: formData.get('formTipo'),
             concepto: formData.get('formConcepto'),
             monto: formData.get('formMonto'),
-            id_obra: formData.get('formObra'),
+            id_obra: formData.get('formObra') === '' ? null : formData.get('formObra'),
         };
 
-        const nuevoId = await agregarFinanza(datosFinanza);
+        const validacion = finanzaSchema.safeParse(datosFinanza);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(e => e.message).join(', ');
+            return NextResponse.json({ status: "error", message: `Error de validación: ${errores}` }, { status: 400 });
+        }
+
+        const nuevoId = await agregarFinanza(validacion.data);
         return NextResponse.json({ status: "exito", message: "Registro financiero agregado con exito", id: nuevoId }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
@@ -54,12 +61,18 @@ export async function PUT(request) {
             tipo: datosRaw.formTipoModificar,
             concepto: datosRaw.formConceptoModificar,
             monto: datosRaw.formMontoModificar,
-            id_obra: datosRaw.formObraModificar,
+            id_obra: datosRaw.formObraModificar === '' ? null : datosRaw.formObraModificar,
         };
 
         console.log('DATOS ACTUALIZAR EN API FINANZAS> ', datosFinanza);
 
-        await cambioFinanza(id, datosFinanza);
+        const validacion = finanzaSchema.safeParse(datosFinanza);
+        if (!validacion.success) {
+            const errores = validacion.error.issues.map(e => e.message).join(', ');
+            return NextResponse.json({ status: "error", message: `Error de validación: ${errores}` }, { status: 400 });
+        }
+
+        await cambioFinanza(id, validacion.data);
         return NextResponse.json({ status: "exito", message: "Registro financiero modificado con exito" });
     } catch (error) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
