@@ -1,0 +1,22 @@
+FROM mysql:8.4
+
+ARG DB_NAME
+ARG DB_ROOT_PASSWORD
+
+ENV MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+ENV MYSQL_DATABASE=${DB_NAME}
+
+COPY init.sql /docker-entrypoint-initdb.d/init.sql
+
+RUN { \
+      (/usr/local/bin/docker-entrypoint.sh mysqld --datadir=/var/lib/mysql &) ; \
+      printf '[client]\npassword=%s\n' "${MYSQL_ROOT_PASSWORD}" > /tmp/mysql-creds.cnf; \
+      chmod 600 /tmp/mysql-creds.cnf; \
+      for i in $(seq 1 30); do \
+        mysqladmin --defaults-extra-file=/tmp/mysql-creds.cnf ping -h 127.0.0.1 -uroot --silent && break; \
+        sleep 2; \
+      done; \
+      mysqladmin --defaults-extra-file=/tmp/mysql-creds.cnf shutdown -h 127.0.0.1 -uroot; \
+      sleep 2; \
+      rm -f /tmp/mysql-creds.cnf; \
+    }
