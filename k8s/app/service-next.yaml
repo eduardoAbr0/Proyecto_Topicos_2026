@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: teatrop-nextjs-service
+  namespace: default
+spec:
+  selector:
+    app: teatrop-nextjs-deployment
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30001

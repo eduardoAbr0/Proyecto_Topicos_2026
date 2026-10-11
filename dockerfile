@@ -43,11 +43,6 @@ COPY . .
 
 ENV NODE_ENV=production
 
-# Build-time public env vars (baked into client JS bundle).
-# Pass the real value with: --build-arg NEXT_PUBLIC_CLOUDFLARE_SITEKEY=xxxx
-ARG NEXT_PUBLIC_CLOUDFLARE_SITEKEY
-ENV NEXT_PUBLIC_CLOUDFLARE_SITEKEY=$NEXT_PUBLIC_CLOUDFLARE_SITEKEY
-
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.

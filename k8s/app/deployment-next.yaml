@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teatrop-nextjs-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: teatrop-nextjs-deployment
+  template:
+    metadata:
+      labels:
+        app: teatrop-nextjs-deployment
+    spec:
+      containers:
+        - name: teatrop-nextjs-deployment
+          image: teatrop-nextjs:0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: next-secret
+            - secretRef:
+                name: mysql-secret
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_PORT
+              value: "3306"
