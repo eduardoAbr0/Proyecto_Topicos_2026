@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    K8S_SERVER = 'https://127.0.0.1:64770'
+    K8S_SERVER = 'https://127.0.0.1:62594'
   }
 
   stages {
